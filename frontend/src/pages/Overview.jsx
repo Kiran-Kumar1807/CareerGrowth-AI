@@ -99,7 +99,13 @@ export default function Overview() {
       setSessionId(analysis.session_id)
       setStep('')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Analysis failed. Please check your API key and try again.')
+      const detail = err.response?.data?.detail || ''
+      const isRateLimit = detail.includes('429') || detail.toLowerCase().includes('rate')
+      setError(
+        isRateLimit
+          ? 'The AI model is rate-limited right now. Please wait 30 seconds and try again.'
+          : detail || 'Analysis failed. Please try again.'
+      )
     } finally {
       setLoading(false)
     }
