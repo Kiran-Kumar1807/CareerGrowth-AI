@@ -48,6 +48,23 @@ def _call_openai(prompt: str, system: str) -> str:
     return response.choices[0].message.content
 
 
+def _call_groq(prompt: str, system: str) -> str:
+    from openai import OpenAI
+    client = OpenAI(
+        api_key=settings.GROQ_API_KEY,
+        base_url=settings.GROQ_BASE_URL,
+    )
+    response = client.chat.completions.create(
+        model=settings.GROQ_MODEL,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=4096,
+    )
+    return response.choices[0].message.content
+
+
 def _call_openrouter(prompt: str, system: str) -> str:
     from openai import OpenAI
     client = OpenAI(
@@ -87,6 +104,8 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant. Always resp
         raw = _with_retry(_call_claude, prompt, system)
     elif settings.AI_PROVIDER == "openrouter":
         raw = _with_retry(_call_openrouter, prompt, system)
+    elif settings.AI_PROVIDER == "groq":
+        raw = _with_retry(_call_groq, prompt, system)
     else:
         raw = _with_retry(_call_openai, prompt, system)
     return _extract_json(raw)
@@ -98,5 +117,7 @@ def call_ai_text(prompt: str, system: str = "You are a helpful assistant.") -> s
         return _with_retry(_call_claude, prompt, system)
     elif settings.AI_PROVIDER == "openrouter":
         return _with_retry(_call_openrouter, prompt, system)
+    elif settings.AI_PROVIDER == "groq":
+        return _with_retry(_call_groq, prompt, system)
     else:
         return _with_retry(_call_openai, prompt, system)
