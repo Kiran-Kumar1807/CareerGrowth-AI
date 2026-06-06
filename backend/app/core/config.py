@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     # OpenRouter — OpenAI-compatible API that proxies many models
     OPENROUTER_API_KEY: str = ""
-    OPENROUTER_MODEL: str = "openai/gpt-4o-mini"
+    OPENROUTER_MODEL: str = "openai/gpt-oss-120b:free"
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
 
     # App
