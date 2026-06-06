@@ -1,6 +1,13 @@
 import json
 import re
+import time
+import logging
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
+MAX_RETRIES = 4
+BASE_DELAY  = 8  # seconds
 
 
 def _extract_json(text: str) -> dict:
@@ -58,22 +65,38 @@ def _call_openrouter(prompt: str, system: str) -> str:
     return response.choices[0].message.content
 
 
+def _with_retry(fn, prompt: str, system: str) -> str:
+    """Retry on 429 rate-limit errors with exponential backoff."""
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return fn(prompt, system)
+        except Exception as e:
+            is_rate_limit = "429" in str(e) or "rate" in str(e).lower()
+            if is_rate_limit and attempt < MAX_RETRIES:
+                wait = BASE_DELAY * attempt   # 8s → 16s → 24s
+                logger.warning(f"Rate limited. Retry {attempt}/{MAX_RETRIES} in {wait}s...")
+                time.sleep(wait)
+            else:
+                raise
+    raise RuntimeError("All retries exhausted")
+
+
 def call_ai(prompt: str, system: str = "You are a helpful assistant. Always respond with valid JSON.") -> dict:
     """Call configured AI provider and return parsed JSON response."""
     if settings.AI_PROVIDER == "claude":
-        raw = _call_claude(prompt, system)
+        raw = _with_retry(_call_claude, prompt, system)
     elif settings.AI_PROVIDER == "openrouter":
-        raw = _call_openrouter(prompt, system)
+        raw = _with_retry(_call_openrouter, prompt, system)
     else:
-        raw = _call_openai(prompt, system)
+        raw = _with_retry(_call_openai, prompt, system)
     return _extract_json(raw)
 
 
 def call_ai_text(prompt: str, system: str = "You are a helpful assistant.") -> str:
     """Call configured AI provider and return raw text response."""
     if settings.AI_PROVIDER == "claude":
-        return _call_claude(prompt, system)
+        return _with_retry(_call_claude, prompt, system)
     elif settings.AI_PROVIDER == "openrouter":
-        return _call_openrouter(prompt, system)
+        return _with_retry(_call_openrouter, prompt, system)
     else:
-        return _call_openai(prompt, system)
+        return _with_retry(_call_openai, prompt, system)
