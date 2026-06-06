@@ -1,0 +1,51 @@
+# === SECRETS ===
+backend/.env
+*.env
+.env.*
+!.env.example
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+*.egg
+pip-log.txt
+
+# === NODE / FRONTEND ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/build/
+
+# === IDE ===
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === LOGS ===
+*.log
+logs/
+npm-debug.log*
+
+# === MISC ===
+*.tmp
+*.bak
+.cache/
