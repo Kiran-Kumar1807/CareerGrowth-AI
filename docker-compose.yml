@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: careergrowth-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - careergrowth-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: careergrowth-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - careergrowth-network
+    restart: unless-stopped
+
+networks:
+  careergrowth-network:
+    driver: bridge
