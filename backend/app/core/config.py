@@ -25,7 +25,12 @@ class Settings(BaseSettings):
 
     # App
     APP_NAME: str = "CareerGrowth AI"
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000", "http://localhost:5174"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:5174",
+        "https://careergrowth-ai-1.onrender.com",
+    ]
 
     class Config:
         env_file = ".env"
