@@ -45,9 +45,6 @@ desktop.ini
 logs/
 npm-debug.log*
 
-# === DOCKER ===
-.dockerignore
-
 # === MISC ===
 *.tmp
 *.bak
